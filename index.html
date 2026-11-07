@@ -4,12 +4,12 @@
 <main><h1 id="t"></h1><a class="cv" id="cv"></a></main>
 <script>
 const T={pt:{t:"Olá, eu sou o Gessé 👋",b:"Baixar currículo",f:"cv.pdf",n:"Curriculo-Gesse-Soares-PT.pdf"},en:{t:"Hi, I'm Gessé 👋",b:"Download resume",f:"cv-en.pdf",n:"Resume-Gesse-Soares-EN.pdf"}};
-const h=document.documentElement;let manual=null,busy=false;
+const h=document.documentElement;let manual=null,mine="";
 const det=()=>manual||(/^en/i.test(h.lang)?"en":/^pt/i.test(h.lang)?"pt":(/^pt/i.test(navigator.language)?"pt":"en"));
 function apply(){const l=det(),d=T[l],a=document.getElementById("cv");a.href="https://gessemacedo.github.io/assets/"+d.f;a.download=d.n;
-if(!h.classList.contains("translated-ltr")){document.getElementById("t").textContent=d.t;a.textContent=d.b;busy=true;h.lang=l==="pt"?"pt-BR":"en";busy=false}
+if(!h.classList.contains("translated-ltr")){document.getElementById("t").textContent=d.t;a.textContent=d.b;mine=l==="pt"?"pt-BR":"en";if(h.lang!==mine)h.lang=mine}
 document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l===l))}
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{manual=b.dataset.l;apply()});
-new MutationObserver(()=>{if(!busy){manual=null;apply()}}).observe(h,{attributes:true,attributeFilter:["lang","class"]});
-h.lang="";apply();
+new MutationObserver(()=>{if(h.lang!==mine||h.classList.contains("translated-ltr")){manual=null;apply()}}).observe(h,{attributes:true,attributeFilter:["lang","class"]});
+h.lang="";apply()
 </script></body></html>
