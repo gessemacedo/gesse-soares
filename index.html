@@ -1,10 +1,15 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gessé Soares</title>
 <style>body{margin:0;font-family:system-ui,sans-serif;background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;min-height:100vh;min-height:100dvh;box-sizing:border-box;display:grid;place-items:center;text-align:center}main{padding:2rem 1.5rem 12vh;max-width:640px;width:100%;box-sizing:border-box}h1{font-size:2.5rem;margin:0 0 1rem}a.cv{display:inline-block;margin-top:1.5rem;padding:.8rem 1.6rem;border-radius:999px;background:#38bdf8;color:#0f172a;font-weight:700;text-decoration:none}.lang{position:fixed;top:1rem;right:1rem;display:flex;gap:.4rem}.lang button{background:transparent;color:#fff;border:1px solid #fff6;border-radius:999px;padding:.3rem .8rem;cursor:pointer}.lang button.on{background:#fff;color:#0f172a}</style></head>
-<body><div class="lang" translate="no"><button data-l="pt" class="on">PT</button><button data-l="en">EN</button></div>
+<body><div class="lang" translate="no"><button data-l="pt" class="on" aria-pressed="true">PT</button><button data-l="en" aria-pressed="false">EN</button></div>
 <main><h1 id="t">Olá, eu sou o Gessé 👋</h1><a class="cv" id="cv" href="https://gessemacedo.github.io/assets/cv.pdf" download="Curriculo-Gesse-Soares-PT.pdf">Baixar currículo</a></main>
 <script>
+const K="gesse-soares.lang";
 const T={pt:["Olá, eu sou o Gessé 👋","Baixar currículo","cv.pdf","Curriculo-Gesse-Soares-PT.pdf","pt-BR"],en:["Hi, I'm Gessé 👋","Download resume","cv-en.pdf","Resume-Gesse-Soares-EN.pdf","en"]};
-document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{const d=T[b.dataset.l],a=document.getElementById("cv");
+function pref(){try{const v=localStorage.getItem(K);return v==="pt"||v==="en"?v:"pt"}catch(e){return"pt"}}
+function save(l){if(l!=="pt"&&l!=="en")return;try{localStorage.setItem(K,l)}catch(e){}}
+function apply(l){const d=T[l]||T.pt,a=document.getElementById("cv"),on=T[l]?l:"pt";
 document.getElementById("t").textContent=d[0];a.textContent=d[1];a.href="https://gessemacedo.github.io/assets/"+d[2];a.download=d[3];document.documentElement.lang=d[4];
-document.querySelectorAll(".lang button").forEach(x=>x.classList.toggle("on",x===b))});
+document.querySelectorAll(".lang button").forEach(x=>{const sel=x.dataset.l===on;x.classList.toggle("on",sel);x.setAttribute("aria-pressed",sel?"true":"false")})}
+apply(pref());
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{if(!T[b.dataset.l])return;apply(b.dataset.l);save(b.dataset.l)});
 </script></body></html>
