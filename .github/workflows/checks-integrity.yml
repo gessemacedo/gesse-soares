@@ -1,0 +1,48 @@
+name: checks-integrity
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  checks-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir se o PR altera as próprias checagens
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          if gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq '.labels[].name' | grep -qx 'checks-ok'; then
+            echo "Label checks-ok presente. Alteração das checagens autorizada."
+            exit 0
+          fi
+
+          files_raw=$(gh api --paginate "repos/${REPO}/pulls/${PR_NUMBER}/files" --jq '.[].filename')
+
+          hit=()
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              .github/*|.cursor/skills/verify/*|.claude/skills/verify/*|tests/*|AGENTS.md|scripts/check-links.mjs|playwright.config.js|package.json|package-lock.json|.htmlvalidate.json)
+                hit+=("$f")
+                ;;
+            esac
+          done <<< "$files_raw"
+
+          if ((${#hit[@]})); then
+            echo "Este PR altera as próprias checagens."
+            echo "Para seguir, alguém com permissão de escrita precisa revisar e colocar a label checks-ok."
+            printf ' - %s\n' "${hit[@]}"
+            exit 1
+          fi
+
+          echo "Nenhum arquivo de checagem foi alterado."
