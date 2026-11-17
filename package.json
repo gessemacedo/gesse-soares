@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "lint:html": "html-validate index.html",
+    "check:links": "node scripts/check-links.mjs",
+    "check:skills": "cmp -s .cursor/skills/verify/SKILL.md .claude/skills/verify/SKILL.md || (echo 'As duas skills de verify divergiram.' && exit 1)",
+    "test": "playwright test",
+    "verify": "npm run lint:html && npm run check:links && npm run check:skills && npm test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "html-validate": "^11.21.1"
+  }
+}
